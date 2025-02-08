@@ -1,4 +1,5 @@
 export const SKIP_PROXY_FLAG = Symbol('skip-proxy');
+export const SHALLOW = Symbol("shallow") // 只响应一层
 export const OBSERVER_DESCRIPTOR_BUILDER_FLAG = Symbol("observer-descriptor-builder")
 export const OBSERVER_DESCRIPTOR_FLAG = Symbol("observer-descriptor")
 export const PATH_DELIMITER = '.' 

@@ -3,6 +3,7 @@ import { hookArrayMethods } from './hookArray';
 import { StateOperateType } from './types'; 
 import { CyleDependError } from '../errors'; 
 import { ComputedState } from '../types';
+import { isShallow } from '../utils';
 
 
 const __NOTIFY__ = Symbol('__NOTIFY__')
@@ -57,7 +58,9 @@ function createProxy(target: any, parentPath: string[],proxyCache:WeakMap<any,an
                     return value
                 }                   
             }                
-            options.notify({type:'get', path,indexs:[], value,oldValue: undefined, parentPath,parent: obj});                        
+            options.notify({type:'get', path,indexs:[], value,oldValue: undefined, parentPath,parent: obj});  
+            // 只响应一层  
+            if(isShallow(value)) return value
             return  createProxy(value, path,proxyCache,isComputedCreating,options); 
         },
         set: (obj, prop, value, receiver) => {
