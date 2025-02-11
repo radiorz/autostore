@@ -36,5 +36,5 @@ export * from "./createObserverObject"
 export * from "./isComputedDescriptorParameter"
 export * from "./getAsyncVal"
 export * from "./createAsyncComptuedValue"
-export * from './isShallow'
+export * from './markObject'
 export * from './markShallow'
