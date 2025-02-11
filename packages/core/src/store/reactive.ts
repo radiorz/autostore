@@ -3,8 +3,6 @@ import { hookArrayMethods } from './hookArray';
 import { StateOperateType } from './types'; 
 import { CyleDependError } from '../errors'; 
 import { ComputedState } from '../types';
-import { isShallow } from '../utils';
-
 
 const __NOTIFY__ = Symbol('__NOTIFY__')
 
@@ -28,7 +26,8 @@ function createProxy(target: any, parentPath: string[],proxyCache:WeakMap<any,an
     }
     if (proxyCache.has(target)) { 
         return proxyCache.get(target);
-    }    
+    }
+
     const proxyObj = new Proxy(target, {             
         get: (obj, key, receiver) => { 
             const value = Reflect.get(obj, key, receiver);  
@@ -38,7 +37,8 @@ function createProxy(target: any, parentPath: string[],proxyCache:WeakMap<any,an
                 if(typeof value === 'function'){
                     if(Array.isArray(obj)){           
                         return hookArrayMethods(options.notify,obj,key as string,value,parentPath); 
-                    }else if(!isRaw(value) && Object.hasOwn(obj,key)){           
+                    }else if(!isRaw(value) && Object.hasOwn(obj,key)){     
+                      // 如果 raw 直接返回.      
                         const pathKey = path.join('.')                          
                         try{  
                             if(isComputedCreating.has(pathKey)){  // 如果已经创建过计算属性，则直接返回
@@ -52,15 +52,13 @@ function createProxy(target: any, parentPath: string[],proxyCache:WeakMap<any,an
                             isComputedCreating.delete(pathKey)
                         }                            
                     }else{
-                        return value.bind(obj)
+                        return value
                     }
                 }else{
                     return value
                 }                   
             }                
             options.notify({type:'get', path,indexs:[], value,oldValue: undefined, parentPath,parent: obj});  
-            // 只响应一层  
-            if(isShallow(value)) return value
             return  createProxy(value, path,proxyCache,isComputedCreating,options); 
         },
         set: (obj, prop, value, receiver) => {
